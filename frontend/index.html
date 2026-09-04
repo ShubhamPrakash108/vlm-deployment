@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VLM Vision Analyzer — AI-Powered Image Understanding</title>
+  <meta name="description" content="Analyze and query any image using a powerful Vision Language Model API. Describe, interrogate, and extract insights from images with natural language." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Animated background -->
+  <div class="bg-grid" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--1" aria-hidden="true"></div>
+  <div class="bg-glow bg-glow--2" aria-hidden="true"></div>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="header__inner">
+      <div class="logo">
+        <div class="logo__icon" aria-hidden="true">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="14" cy="14" r="12" stroke="url(#logoGrad)" stroke-width="2"/>
+            <circle cx="14" cy="14" r="5" fill="url(#logoGrad)"/>
+            <line x1="14" y1="2" x2="14" y2="6" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="14" y1="22" x2="14" y2="26" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="2" y1="14" x2="6" y2="14" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
+            <line x1="22" y1="14" x2="26" y2="14" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
+            <defs>
+              <linearGradient id="logoGrad" x1="2" y1="2" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#a78bfa"/>
+                <stop offset="100%" stop-color="#38bdf8"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <span class="logo__text">VLM<span class="logo__accent">Analyzer</span></span>
+      </div>
+      <div class="header__status" id="healthStatus" title="API Health Status">
+        <span class="status-dot" id="statusDot"></span>
+        <span class="status-label" id="statusLabel">Checking...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="main">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero__badge">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#a78bfa" stroke-width="1.5"/><path d="M5 7l1.5 1.5L9.5 5" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Powered by vLLM + FastAPI
+      </div>
+      <h1 class="hero__title">
+        See Beyond the Pixel.<br/>
+        <span class="gradient-text">Ask Anything.</span>
+      </h1>
+      <p class="hero__subtitle">
+        Submit any image URL and a natural language query. Our Vision Language Model will analyze the image and stream an intelligent response in real time.
+      </p>
+    </section>
+
+    <!-- Main Card -->
+    <section class="card" aria-label="Image Analysis Form">
+      <div class="card__grid">
+
+        <!-- Left: Form -->
+        <div class="card__form-col">
+
+          <!-- API Config -->
+          <div class="form-section">
+            <h2 class="form-section__label">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="3" stroke="#a78bfa" stroke-width="1.5"/><path d="M5 8h6M8 5v6" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Configuration
+            </h2>
+            <div class="field-group">
+              <div class="field">
+                <label class="field__label" for="apiKey">API Key</label>
+                <div class="field__input-wrap">
+                  <input
+                    id="apiKey"
+                    type="password"
+                    class="field__input"
+                    placeholder="Enter your X-API-Key"
+                    value="12345"
+                    autocomplete="off"
+                  />
+                  <button class="field__toggle" id="toggleApiKey" aria-label="Toggle API key visibility" title="Show/hide key">
+                    <svg id="eyeIcon" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 9C1 9 4 3 9 3s8 6 8 6-3 6-8 6S1 9 1 9z" stroke="#94a3b8" stroke-width="1.5"/><circle cx="9" cy="9" r="2.5" stroke="#94a3b8" stroke-width="1.5"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="field">
+                <label class="field__label" for="modelName">Model</label>
+                <input
+                  id="modelName"
+                  type="text"
+                  class="field__input"
+                  placeholder="e.g. Qwen/Qwen2.5-VL-7B-Instruct"
+                  value="Qwen/Qwen2.5-VL-7B-Instruct"
+                />
+              </div>
+            </div>
+          </div>
+
+          <!-- Image Input -->
+          <div class="form-section">
+            <h2 class="form-section__label">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="3" width="14" height="10" rx="2" stroke="#38bdf8" stroke-width="1.5"/><circle cx="5.5" cy="6.5" r="1" stroke="#38bdf8" stroke-width="1.2"/><path d="M1 11l4-3 3 2.5 2-2 5 3" stroke="#38bdf8" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Image URL
+            </h2>
+            <div class="field">
+              <input
+                id="imageUrl"
+                type="url"
+                class="field__input"
+                placeholder="https://example.com/image.jpg"
+                autocomplete="off"
+              />
+              <p class="field__hint">Must be a publicly accessible image (256–1024px)</p>
+            </div>
+          </div>
+
+          <!-- Query -->
+          <div class="form-section">
+            <h2 class="form-section__label">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12M2 8h8M2 12h5" stroke="#a78bfa" stroke-width="1.5" stroke-linecap="round"/></svg>
+              Your Question
+            </h2>
+            <div class="field">
+              <textarea
+                id="queryText"
+                class="field__textarea"
+                rows="3"
+                placeholder="e.g. What objects are in this image? Describe the scene in detail."
+              ></textarea>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button class="btn btn--primary" id="analyzeBtn">
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2v5M9 11v5M2 9h5M11 9h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="9" r="2.5" fill="currentColor"/></svg>
+              <span id="analyzeBtnText">Analyze Image</span>
+              <div class="btn__spinner" id="btnSpinner" aria-hidden="true"></div>
+            </button>
+            <button class="btn btn--ghost" id="clearBtn">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12l-1 9H3L2 4z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M1 4h14M6 4V2h4v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Preview + Response -->
+        <div class="card__preview-col">
+
+          <!-- Image Preview -->
+          <div class="preview-box" id="previewBox">
+            <div class="preview-empty" id="previewEmpty">
+              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" aria-hidden="true">
+                <rect x="4" y="10" width="40" height="28" rx="5" stroke="#334155" stroke-width="2"/>
+                <circle cx="16" cy="20" r="4" stroke="#475569" stroke-width="2"/>
+                <path d="M4 32l10-8 7 6 5-4 10 8" stroke="#475569" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <p>Image preview will appear here</p>
+              <span>Paste an image URL above</span>
+            </div>
+            <img id="previewImg" class="preview-img hidden" alt="Image to analyze" />
+            <div class="preview-loading hidden" id="previewLoading" aria-label="Loading image">
+              <div class="spinner"></div>
+            </div>
+            <div class="preview-error hidden" id="previewError">
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" stroke="#ef4444" stroke-width="2"/><path d="M16 10v7M16 21v1" stroke="#ef4444" stroke-width="2.5" stroke-linecap="round"/></svg>
+              <p>Unable to load image</p>
+            </div>
+
+            <!-- Meta overlay -->
+            <div class="preview-meta hidden" id="previewMeta">
+              <span id="previewMetaDims"></span>
+            </div>
+          </div>
+
+          <!-- Response Box -->
+          <div class="response-box" id="responseBox">
+            <div class="response-box__header">
+              <span class="response-box__title">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 7h10M7 2l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Model Response
+              </span>
+              <div class="response-box__actions">
+                <span class="generation-badge hidden" id="generationBadge"></span>
+                <button class="icon-btn hidden" id="copyBtn" title="Copy response" aria-label="Copy response to clipboard">
+                  <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><rect x="5" y="5" width="9" height="9" rx="2" stroke="currentColor" stroke-width="1.4"/><path d="M3 10V3a2 2 0 012-2h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="response-box__content" id="responseContent">
+              <div class="response-placeholder" id="responsePlaceholder">
+                <div class="response-placeholder__lines">
+                  <div></div><div></div><div></div><div></div>
+                </div>
+                <p>Your analysis results will stream here…</p>
+              </div>
+              <div class="response-text hidden" id="responseText" aria-live="polite"></div>
+              <div class="response-cache-badge hidden" id="responseCacheBadge">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1a5 5 0 100 10A5 5 0 006 1zM4 6l1.5 1.5L8 4" stroke="#22d3ee" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                Served from cache
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats Row -->
+          <div class="stats-row hidden" id="statsRow">
+            <div class="stat-pill" id="statTime">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5.5" stroke="#a78bfa" stroke-width="1.3"/><path d="M6.5 4v3l2 1" stroke="#a78bfa" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span id="statTimeVal">—</span>
+            </div>
+            <div class="stat-pill" id="statTokens">
+              <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="1" y="1" width="11" height="11" rx="2.5" stroke="#38bdf8" stroke-width="1.3"/><path d="M4 6.5h5M6.5 4v5" stroke="#38bdf8" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <span id="statTokensVal">—</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Sample Prompts -->
+    <section class="samples">
+      <h2 class="samples__title">Try a sample query</h2>
+      <div class="samples__chips" id="samplesChips">
+        <button class="chip" data-query="Describe this image in detail.">Describe the scene</button>
+        <button class="chip" data-query="What objects are visible in this image? List them.">List objects</button>
+        <button class="chip" data-query="What text or numbers can you read in this image?">Extract text</button>
+        <button class="chip" data-query="Identify any people in the image and describe what they are doing.">People & actions</button>
+        <button class="chip" data-query="What is the dominant color scheme? Describe the visual mood.">Color & mood</button>
+        <button class="chip" data-query="Is there anything unusual or out of place in this image?">Find anomalies</button>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="how-it-works">
+      <h2 class="how-it-works__title">How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step__icon step__icon--purple">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="5" width="18" height="12" rx="3" stroke="currentColor" stroke-width="1.8"/><circle cx="7.5" cy="9.5" r="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M2 15l5-4 4 3 3-3 6 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Paste an Image URL</h3>
+          <p>Provide a direct link to any publicly accessible image (JPEG, PNG, WebP).</p>
+        </div>
+        <div class="step__connector" aria-hidden="true">
+          <svg width="36" height="12" viewBox="0 0 36 12" fill="none"><path d="M0 6h30M30 6l-5-4M30 6l-5 4" stroke="#475569" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step">
+          <div class="step__icon step__icon--blue">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M4 11h14M11 4l7 7-7 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>Ask Your Question</h3>
+          <p>Type any natural language question about the image you want the VLM to answer.</p>
+        </div>
+        <div class="step__connector" aria-hidden="true">
+          <svg width="36" height="12" viewBox="0 0 36 12" fill="none"><path d="M0 6h30M30 6l-5-4M30 6l-5 4" stroke="#475569" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="step">
+          <div class="step__icon step__icon--teal">
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M3 11c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M11 7v4l3 2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Get Streamed Results</h3>
+          <p>Responses stream in real time from the vLLM backend with Redis caching.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast -->
+  <div class="toast hidden" id="toast" role="alert" aria-live="assertive">
+    <span id="toastMsg"></span>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>VLM Analyzer &copy; 2026 &mdash; Built with FastAPI + vLLM + Redis</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
