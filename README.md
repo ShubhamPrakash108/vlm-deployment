@@ -184,7 +184,7 @@ vlm-deployment/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/vlm-deployment.git
+git clone https://github.com/shubhamprakash108/vlm-deployment.git
 cd vlm-deployment
 ```
 
@@ -620,11 +620,6 @@ The Dockerfile uses a two-stage build to keep the final image small — the buil
 - [ ] A/B testing framework for comparing different VLM models
 - [ ] Request queuing with priority lanes for different API key tiers
 
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
 
 ---
 
